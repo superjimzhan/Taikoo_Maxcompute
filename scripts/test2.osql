@@ -1,0 +1,22 @@
+set odps.sql.allow.fullscan=true;
+set odps.sql.validate.orderby.limit=false;
+
+
+
+CREATE TABLE IF NOT EXISTS ods_parking_vip_balance_infos_base (
+  `id` BIGINT,
+  `created_at` DATETIME,
+  `updated_at` DATETIME,
+  `deleted_at` DATETIME,
+  `org_id` BIGINT,
+  `created_by_id` BIGINT,
+  `updated_by_id` BIGINT,
+  `deleted_by_id` BIGINT,
+  `remark` STRING,
+  `ts` DATETIME,
+  `vip_code` STRING,
+  `mobile` STRING,
+  `openid` STRING,
+  `balance` BIGINT);
+
+

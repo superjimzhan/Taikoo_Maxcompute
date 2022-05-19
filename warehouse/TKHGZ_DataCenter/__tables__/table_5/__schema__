@@ -1,0 +1,3 @@
+project=TKHGZ_DataCenter
+table=table_5
+columns=col1:BIGINT,col2:BIGINT,col3:BIGINT

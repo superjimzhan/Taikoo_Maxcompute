@@ -1,0 +1,84 @@
+set odps.sql.allow.fullscan=true;
+-- 建表
+
+-- dws_parking_vip_balance_infos
+with incr as
+(
+  select  incr.record_id, incr.operation_flag, incr.after_flag,id,
+          created_at,
+          updated_at,
+          deleted_at,
+          ts,
+          vip_code,
+          mobile,
+          openid,
+          balance
+from  ods_parking_vip_balance_infos_log incr
+  where utc_timestamp<= (select max(utc_timestamp) from ods_parking_vip_balance_infos_log)
+),base as
+(
+  select 0 as record_id, 'I' as operation_flag, 'Y' as after_flag,
+        id,
+         created_at,
+         updated_at,
+         deleted_at,
+         ts,
+         vip_code,
+         mobile,
+         openid,
+         balance
+from ods_parking_vip_balance_infos_base base
+),union_incr_base as
+(
+  select row_number() over(partition by id order by record_id desc, after_flag desc) as record_num, record_id, operation_flag, after_flag,
+         id,
+         created_at,
+         updated_at,
+         deleted_at,
+         ts,
+         vip_code,
+         mobile,
+         openid,
+         balance
+  from
+  (
+    select * from incr
+    union all
+    select * from base
+  )
+)
+
+insert overwrite table dws_parking_vip_balance_infos
+  select
+  id,
+  created_at,
+  updated_at,
+  deleted_at,
+  ts,
+  vip_code,
+  mobile,
+  openid,
+  balance
+  from union_incr_base
+  where  record_num=1 and after_flag='Y';
+
+
+
+select id,
+       created_at,
+       updated_at,
+       deleted_at,
+       org_id,
+       created_by_id,
+       updated_by_id,
+       deleted_by_id,
+       remark,
+       ts,
+       vip_code,
+       mobile,
+       add,
+       sub,
+       balance,
+       memo,
+       type
+from TKHGZ_DataCenter.ods_parking_vip_balance_journals_base;
